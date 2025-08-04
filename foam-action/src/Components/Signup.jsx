@@ -1,11 +1,61 @@
+import { useActionState } from "react";
+
+import {
+  isEmail,
+  isEqualToOtherValue,
+  isNotEmpty,
+  hasMinLength,
+} from "../util/validation.js";
+
 export default function Signup() {
-  function signupAction(formData) {
-    const enteredEmail = formData.get('email')
-    console.log(enteredEmail);
+  function signupAction(prevFormState, formData) {
+    const email = formData.get("email");
+    const password = formData.get("pasword");
+    const confirmPassword = formData.get("confirm-password");
+    const firstName = formData.get("first-name");
+    const lastName = formData.get("last-name");
+    const role = formData.get("role");
+    const terms = formData.get("terms");
+    const acquisition = formData.getAll("acquisition");
+
+    let errors = [];
+
+    if (!isEmail(email)) {
+      errors.push("Email is not valid");
+    }
+    if (!isNotEmpty(password) || !hasMinLength(password, 6)) {
+      errors.push("Password is required at least 6 characters long");
+    }
+
+    if (isEqualToOtherValue(password, confirmPassword)) {
+      errors.push("Passwords do not match");
+    }
+
+    if (!isNotEmpty(firstName) || !isNotEmpty(lastName)) {
+      errors.push("First name and last name are both required");
+    }
+
+    if (!isNotEmpty(role)) {
+      errors.push("Role is required");
+    }
+    if (!terms) {
+      errors.push("You must agree to the terms and conditions");
+    }
+    if (acquisition.length === 0) {
+      errors.push("You must select at least one option for acquisition");
+    }
+
+    if (errors.length > 0) {
+      return { errors };
+    }
+    return { errors: null };
   }
+  const [formState, formAction] = useActionState(signupAction, {
+    errors: null,
+  });
 
   return (
-    <form action={signupAction}>
+    <form action={formAction}>
       <h2>Welcome on board!</h2>
       <p>We just need a little bit of data from you to get you started 🚀</p>
 
@@ -89,6 +139,14 @@ export default function Signup() {
           agree to the terms and conditions
         </label>
       </div>
+
+      {formState.errors && (
+        <ul className="error">
+          {formState.errors.map((error) => (
+            <li key={error}> {error}</li>
+          ))}
+        </ul>
+      )}
 
       <p className="form-actions">
         <button type="reset" className="button button-flat">

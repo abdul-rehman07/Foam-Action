@@ -3,7 +3,11 @@ export function isEmail(value) {
 }
 
 export function isNotEmpty(value) {
-  return value.trim() !== "";
+  if (value !== null && value !== undefined) {
+    return typeof value === "string" ? value.trim() !== "" : Array.isArray(value) ? value.length > 0 : true;
+  } else {
+    return false;
+  }
 }
 
 export function hasMinLength(value, minLength) {
