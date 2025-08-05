@@ -46,7 +46,18 @@ export default function Signup() {
     }
 
     if (errors.length > 0) {
-      return { errors };
+      return {
+        errors, enteredValue: {
+          email,
+          password,
+          confirmPassword,
+          firstName,
+          lastName,
+          role,
+          terms,
+          acquisition
+        }
+      };
     }
     return { errors: null };
   }
@@ -61,7 +72,9 @@ export default function Signup() {
 
       <div className="control">
         <label htmlFor="email">Email</label>
-        <input id="email" type="email" name="email" />
+        <input id="email" type="email" name="email"
+          defaultValue={formState.enteredValue?.email}
+        />
       </div>
 
       <div className="control-row">
